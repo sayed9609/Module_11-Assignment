@@ -51,7 +51,7 @@ class ProductController extends Controller
     function products()
     {
         // $products = Product::paginate(5);
-        $products = DB::table("products")->get();
+        $products = DB::table("products")->paginate(4);
 
         return view('pages.products', [
             'products' => $products
@@ -73,13 +73,13 @@ class ProductController extends Controller
         ]);
 
 
-        return redirect()->route('pages.products');
+        return redirect()->route('pages.products')->with('add', 'Added successfully');
     }
 
     function edit($id)
     {
         $products = DB::table('products')->find($id);
-        return view('pages.productEdit', ['products' => $products]);
+        return view('pages.productEdit', ['products' => $products])->with('edit', 'Edited successfully');
     }
 
     function update(Request $request, $id)
@@ -89,13 +89,13 @@ class ProductController extends Controller
             'quantity' => $request->input('quantity'),
             'price' => $request->input('price')
         ]);
-        return redirect()->route('pages.products');
+        return redirect()->route('pages.products')->with('update', 'Updated Successfully');
     }
 
     function delete($id)
     {
         DB::table('products')->where('id', $id)->delete();
-        return redirect()->route('pages.products');
+        return redirect()->route('pages.products')->with('delete', 'Deleted Successfully');
     }
 
 
@@ -115,7 +115,14 @@ class ProductController extends Controller
         $p_quantity = $product->quantity;
         $t_quantity = $request->input('quantity');
 
-        // Calculate 
+        if ($p_quantity < 1) {
+            // Quantity is less than 1, prevent sale
+            return redirect()->back()->with('error', 'Stock Out');
+        } elseif ($p_quantity < $t_quantity) {
+            return redirect()->back()->with('error', 'Low Stock');
+        }
+
+        // Calculate sale quantity
         $update_quantity = $p_quantity - $t_quantity;
 
         // Calculate total price
@@ -135,7 +142,7 @@ class ProductController extends Controller
             'quantity' => $update_quantity
         ]);
 
-        return redirect()->route('pages.transactions');
+        return redirect()->route('pages.transactions')->with('success','Successfully sold ');
     }
 
 
@@ -143,7 +150,7 @@ class ProductController extends Controller
     {
 
         //return view('pages.transactions', compact('transactions'));
-        $transactions = DB::table("transactions")->get();
+        $transactions = DB::table("transactions")->paginate(4);
 
         return view('pages.transactions', [
             'transactions' => $transactions
