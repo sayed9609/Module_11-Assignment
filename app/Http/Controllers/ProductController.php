@@ -11,39 +11,32 @@ class ProductController extends Controller
 
     function dashboard()
     {
-        $currentDate = Carbon::now()->toDateString();
-        $yesterdayDate = Carbon::yesterday()->toDateString();
-        $currentMonth = Carbon::now()->startOfMonth()->toDateString();
-        $currentMonthEnd = Carbon::now()->endOfMonth()->toDateString();
-        $lastMonthStart = Carbon::now()->subMonth()->startOfMonth()->toDateString();
-        $lastMonthEnd = Carbon::now()->subMonth()->endOfMonth()->toDateString();
-
+        // Get total sales for today
         $todaysSales = DB::table('transactions')
-            ->selectRaw('SUM(total_price) as total_sales')
-            ->whereDate('created_at', $currentDate)
-            ->first();
+            ->whereDate('created_at', now()->toDateString())
+            ->sum('total_price');
 
+        // Get total sales for yesterday
         $yesterdaysSales = DB::table('transactions')
-            ->selectRaw('SUM(total_price) as total_sales')
-            ->whereDate('created_at', $yesterdayDate)
-            ->first();
+            ->whereDate('created_at', now()->subDay()->toDateString())
+            ->sum('total_price');
 
+        // Get total sales for this month
         $thisMonthsSales = DB::table('transactions')
-            ->selectRaw('SUM(total_price) as total_sales')
-            ->whereBetween('created_at', [$currentMonth, $currentMonthEnd])
-            ->first();
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->sum('total_price');
 
+        // Get total sales for last month
         $lastMonthsSales = DB::table('transactions')
-            ->selectRaw('SUM(total_price) as total_sales')
-            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
-            ->first();
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->whereMonth('created_at', now()->subMonth()->month)
+            ->sum('total_price');
 
-        return view('dashboard')->with([
-            'todaysSales' => $todaysSales,
-            'yesterdaysSales' => $yesterdaysSales,
-            'thisMonthsSales' => $thisMonthsSales,
-            'lastMonthsSales' => $lastMonthsSales,
-        ]);
+        return view('dashboard', compact('todaysSales',
+                                        'yesterdaysSales', 
+                                        'thisMonthsSales', 
+                                        'lastMonthsSales'));
     }
 
 
