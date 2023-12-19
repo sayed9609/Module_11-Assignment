@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
+
+
     function sale()
     {
         $products = DB::table("products")->get();
@@ -15,11 +17,19 @@ class SaleController extends Controller
             'products' => $products
         ]);
     }
+
+
     function saleStore(Request $request)
     {
 
+        $this->validate($request,[
+            'customer_name' => 'required|string',
+            'product_id' => 'required|integer',
+            'quantity' => 'required|integer'
+        ]);
+
         // Get product information from the products table
-        $product = DB::table('products')->where('id', $request->input('name'))->first();
+        $product = DB::table('products')->where('id', $request->input('product_id'))->first();
         $p_quantity = $product->quantity;
         $t_quantity = $request->input('quantity');
 

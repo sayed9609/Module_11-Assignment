@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
 
 // Routes for Dashboard Page
 
-Route::get('/dashboard',[DashboardController::class, 'dashboard' ])->middleware(['auth', 'verified'])->name('dashboard')->prefix('product');
+Route::get('/dashboard',[DashboardController::class, 'dashboard' ])->middleware(['auth', 'verified'])->name('dashboard');
 
 
 // Routes for Products Page 
