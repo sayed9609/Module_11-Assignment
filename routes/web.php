@@ -44,9 +44,9 @@ Route::get('/dashboard',[DashboardController::class, 'dashboard' ])->middleware(
 Route::prefix('product')->middleware('auth')->group(function () {
     Route::get('/products', [ProductController::class, 'products'])->name('pages.products');
     Route::get('/create', [ProductController::class, 'create'])->name('pages.create');
-    Route::post('/store', [ProductController::class, 'store'])->name('pages.store');
+    Route::post('/create', [ProductController::class, 'store'])->name('pages.create');
     Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('pages.edit');
-    Route::put('/update/{id}', [ProductController::class, 'update'])->name('pages.update');
+    Route::put('/edit/{id}', [ProductController::class, 'update'])->name('pages.edit');
     Route::get('/delete/{id}', [ProductController::class, 'delete'])->name('pages.delete');
     
 });
