@@ -1,8 +1,11 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,30 +18,53 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Login & Signup Page
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard',[ProductController::class, 'dashboard' ])->middleware(['auth', 'verified'])->name('dashboard');
 
-
+// Routes for Profile Page
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+
+// Routes for Dashboard Page
+
+Route::get('/dashboard',[DashboardController::class, 'dashboard' ])->middleware(['auth', 'verified'])->name('dashboard')->prefix('product');
+
+
+// Routes for Products Page 
+
+Route::prefix('product')->middleware('auth')->group(function () {
     Route::get('/products', [ProductController::class, 'products'])->name('pages.products');
     Route::get('/create', [ProductController::class, 'create'])->name('pages.create');
     Route::post('/store', [ProductController::class, 'store'])->name('pages.store');
     Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('pages.edit');
     Route::put('/update/{id}', [ProductController::class, 'update'])->name('pages.update');
     Route::get('/delete/{id}', [ProductController::class, 'delete'])->name('pages.delete');
-    Route::get('/sale', [ProductController::class, 'sale'])->name('pages.sale');
-    Route::post('/sale', [ProductController::class, 'saleStore'])->name('pages.saleStore');
-
-    Route::get('/transactions', [ProductController::class, 'transactions'])->name('pages.transactions');
-    //Route::post('/transections', [ProductController::class, 'transections'])->name('pages.sale');
-
+    
 });
+
+
+// Routes for Sale Page
+
+Route::prefix('product')->middleware('auth')->group(function () {
+    Route::get('/sale', [SaleController::class, 'sale'])->name('pages.sale');
+    Route::post('/sale', [SaleController::class, 'saleStore'])->name('pages.sale');
+});
+
+
+// Routes for Transaction Page
+
+Route::prefix('product')->middleware('auth')->group(function () {
+    Route::get('/transactions', [TransactionController::class, 'transactions'])->name('pages.transactions');
+});
+
 
 require __DIR__.'/auth.php';
